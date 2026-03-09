@@ -64,7 +64,9 @@ dependencies {
             "com.viaversion:nbt:5.0.0"
     ]
     shadowLibs.each {
-        shadow(implementation(it))
+        shadow(implementation(it)) {
+            exclude group: "it.unimi.dsi", module: "fastutil"
+        }
     }
 }
 
