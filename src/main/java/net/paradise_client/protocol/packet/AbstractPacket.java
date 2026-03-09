@@ -2,9 +2,11 @@ package net.paradise_client.protocol.packet;
 
 import com.google.common.base.*;
 import com.mojang.authlib.properties.Property;
+import com.viaversion.nbt.io.NBTIO;
+import com.viaversion.nbt.tag.CompoundTag;
 import io.netty.buffer.*;
 import net.paradise_client.protocol.*;
-import se.llbit.nbt.*;
+import net.paradise_client.protocol.ItemStack;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -270,41 +272,88 @@ public abstract class AbstractPacket {
     return properties;
   }
 
-  public static Tag readTag(ByteBuf input, int protocolVersion) {
-    DataInputStream in = new DataInputStream(new ByteBufInputStream(input));
-    Tag tag;
-    if (protocolVersion >= 764) {
-      try {
-        byte type = in.readByte();
-        if (type == 0) {
-          return Tag.END;
-        }
+  public static CompoundTag readTag(ByteBuf input) {
+    try {
+      int readerIndex = input.readerIndex();
+      byte tagId = input.readByte();
 
-        tag = SpecificTag.read(type, in);
-      } catch (IOException ex) {
-        tag = new ErrorTag("IOException while reading tag type:\n" + ex.getMessage());
+      if (tagId == 0) {
+        return null;
       }
-    } else {
-      tag = NamedTag.read(in);
-    }
 
-    Preconditions.checkArgument(!tag.isError(), "Error reading tag: %s", tag.error());
-    return tag;
+      input.readerIndex(readerIndex);
+
+      ByteBufInputStream byteBufInputStream = new ByteBufInputStream(input);
+
+      return NBTIO.readTag(
+        byteBufInputStream,
+        com.viaversion.nbt.limiter.TagLimiter.noop(),
+        false,
+        CompoundTag.class
+      );
+    } catch (IOException e) {
+      throw new BadPacketException("Failed to read NBT tag", e);
+    }
   }
 
-  public static void writeTag(Tag tag, ByteBuf output, int protocolVersion) {
-    DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
-
+  public static void writeTag(CompoundTag tag, ByteBuf output) {
     try {
-      if (tag instanceof SpecificTag specificTag) {
-        specificTag.writeType(out);
-        specificTag.write(out);
-      } else {
-        tag.write(out);
+      if (tag == null) {
+        output.writeByte(0);
+        return;
       }
+      ByteBufOutputStream byteBufOutputStream = new ByteBufOutputStream(output);
+      NBTIO.writeTag(byteBufOutputStream, tag, false);
+    } catch (IOException e) {
+      throw new BadPacketException("Failed to write NBT tag", e);
+    }
+  }
 
-    } catch (IOException ex) {
-      throw new RuntimeException("Exception writing tag", ex);
+  public static void writeContainerId(int containerId, ByteBuf buf, int protocolVersion) {
+    if (protocolVersion >= ProtocolVersion.V_1_21_2.getProtocol()) {
+      writeVarInt(containerId,buf);
+    } else {
+      buf.writeByte(containerId);
+    }
+  }
+
+  public static int readContainerId(ByteBuf buf, int protocolVersion) {
+    if (protocolVersion >= ProtocolVersion.V_1_21_2.getProtocol()) {
+      return readVarInt(buf);
+    }
+    return buf.readUnsignedByte();
+  }
+
+  public static void writeItemStack(ItemStack stack, int protocolVersion, ByteBuf buf) {
+    ItemStack finalStack = stack == null ? ItemStack.EMPTY : stack;
+    if (protocolVersion < ProtocolVersion.V_1_13_2.getProtocol()) {
+      int id = finalStack.isEmpty() ? -1 : finalStack.getId();
+      buf.writeShort(id);
+      if (id != -1) {
+        buf.writeByte(finalStack.getCount());
+        if (protocolVersion < ProtocolVersion.V_1_13.getProtocol()) {
+          // legacy data - probably damage value, but I'm not sure because there was no doc in packet events
+          buf.writeByte(0);
+        }
+        writeTag(finalStack.getTag(), buf);
+      }
+    } else if (finalStack.isEmpty()) {
+      buf.writeBoolean(false);
+    } else {
+      buf.writeBoolean(true);
+      writeVarInt(finalStack.getId(), buf);
+      buf.writeByte(finalStack.getCount());
+      writeTag(finalStack.getTag(), buf);
+    }
+  }
+
+  public static <K, V> void writeMap(Map<K, V> map, Writer<K> keyConsumer, Writer<V> valueConsumer, ByteBuf buf) {
+    writeVarInt(map.size(), buf);
+    for (Map.Entry<K, V> entry : map.entrySet()) {
+      K key = entry.getKey();
+      V value = entry.getValue();
+      keyConsumer.accept(buf, key);
+      valueConsumer.accept(buf, value);
     }
   }
 
@@ -396,4 +445,8 @@ public abstract class AbstractPacket {
   public abstract boolean equals(Object var1);
 
   public abstract String toString();
+
+  @FunctionalInterface
+  public interface Writer<T> extends BiConsumer<ByteBuf, T> {
+  }
 }

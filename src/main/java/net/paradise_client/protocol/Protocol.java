@@ -56,6 +56,9 @@ public enum Protocol {
         map(ProtocolVersion.V_1_20_3, 16),
         map(ProtocolVersion.V_1_20_5, 18),
         map(ProtocolVersion.V_1_21_2, 20));
+      this.TO_SERVER.registerPacket(ContainerClickC2SPacket.class,
+        ContainerClickC2SPacket::new,
+        map(ProtocolVersion.V_1_20_3, 13));
     }
   }, STATUS {
   }, LOGIN {
