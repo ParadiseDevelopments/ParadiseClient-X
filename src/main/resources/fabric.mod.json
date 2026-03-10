@@ -9,12 +9,13 @@
   ],
   "contributors": [
     "hectograms",
+    "1nstagram",
     "zalgodev",
     "hydrojava"
   ],
   "icon": "assets/paradiseclient/textures/icon/icon.png",
   "contact": {
-    "repo": "https://github.com/Hydrogen-Developments/ParadiseClient-X/",
+    "repo": "https://github.com/ParadiseDevelopments/ParadiseClient-X/",
     "homepage": "https://paradise-client.net"
   },
   "license": "All-Rights-Reserved",
