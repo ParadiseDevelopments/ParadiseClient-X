@@ -19,6 +19,9 @@ import java.util.function.BiConsumer;
  * @author SpigotRCE
  */
 public abstract class AbstractPacket {
+  private boolean encoded = false;
+  private ByteBuf encodedBuf;
+
   public static <T> T readStringMapKey(ByteBuf buf, Map<String, T> map) {
     String string = readString(buf);
     T result = (T) map.get(string);
@@ -436,6 +439,23 @@ public abstract class AbstractPacket {
 
   public Protocol nextProtocol() {
     return null;
+  }
+
+  public boolean isEncoded() {
+    return encoded;
+  }
+
+  public void setEncoded(boolean encoded, ByteBuf buf) {
+    this.encoded = encoded;
+    this.encodedBuf = buf;
+  }
+
+  public ByteBuf getEncodedBuf() {
+    return encodedBuf;
+  }
+
+  public void setEncodedBuf(ByteBuf encodedBuf) {
+    this.encodedBuf = encodedBuf;
   }
 
   public abstract void handle(AbstractPacketHandler var1) throws Exception;
