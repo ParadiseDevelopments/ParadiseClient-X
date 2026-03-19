@@ -10,6 +10,7 @@ import net.minecraft.text.Text;
 import net.paradise_client.util.IPUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,8 +21,11 @@ import java.util.concurrent.CompletableFuture;
 public abstract class DirectConnectScreenMixin extends Screen {
     @Shadow private TextFieldWidget addressField;
     
+    @Unique
     private IPUtil.IPInfo ipInfo;
+    @Unique
     private boolean loading = false;
+    @Unique
     private String lastAddress = "";
 
     protected DirectConnectScreenMixin(Text title) {
@@ -30,11 +34,6 @@ public abstract class DirectConnectScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        addressField.setChangedListener(text -> {
-            this.lastAddress = text;
-            updateIPInfo();
-        });
-
         lastAddress = addressField.getText();
         if (!lastAddress.isEmpty()) {
             updateIPInfo();
@@ -49,7 +48,6 @@ public abstract class DirectConnectScreenMixin extends Screen {
         loading = true;
         CompletableFuture.runAsync(() -> {
             try {
-                // Resolve hostname if needed
                 String host = lastAddress;
                 if (host.contains(":")) {
                     host = host.split(":")[0];
@@ -65,6 +63,12 @@ public abstract class DirectConnectScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        String currentAddress = addressField.getText();
+        if (!currentAddress.equals(lastAddress)) {
+            lastAddress = currentAddress;
+            updateIPInfo();
+        }
+        
         int x = 20;
         int y = this.height / 2 - 60;
         

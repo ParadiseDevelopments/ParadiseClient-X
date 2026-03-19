@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 import net.paradise_client.util.IPUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,10 +17,14 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(AddServerScreen.class)
 public abstract class AddServerScreenMixin extends Screen {
-    @Shadow private TextFieldWidget addressField;
-    
+    @Shadow
+    private TextFieldWidget addressField;
+
+    @Unique
     private IPUtil.IPInfo ipInfo;
+    @Unique
     private boolean loading = false;
+    @Unique
     private String lastAddress = "";
 
     protected AddServerScreenMixin(Text title) {
@@ -29,11 +34,6 @@ public abstract class AddServerScreenMixin extends Screen {
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
         if (addressField != null) {
-            addressField.setChangedListener(text -> {
-                this.lastAddress = text;
-                updateIPInfo();
-            });
-
             lastAddress = addressField.getText();
             if (!lastAddress.isEmpty()) {
                 updateIPInfo();
@@ -49,7 +49,6 @@ public abstract class AddServerScreenMixin extends Screen {
         loading = true;
         CompletableFuture.runAsync(() -> {
             try {
-                // Resolve hostname if needed
                 String host = lastAddress;
                 if (host.contains(":")) {
                     host = host.split(":")[0];
@@ -65,9 +64,17 @@ public abstract class AddServerScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (addressField != null) {
+            String currentAddress = addressField.getText();
+            if (!currentAddress.equals(lastAddress)) {
+                lastAddress = currentAddress;
+                updateIPInfo();
+            }
+        }
+
         int x = 20;
         int y = this.height / 2 - 60;
-        
+
         drawInfo(context, "Organization", ipInfo == null ? "Unknown" : ipInfo.organisation, x, y);
         drawInfo(context, "Country", ipInfo == null ? "Unknown" : ipInfo.country, x, y + 12);
         drawInfo(context, "City", ipInfo == null ? "Unknown" : ipInfo.city, x, y + 24);
