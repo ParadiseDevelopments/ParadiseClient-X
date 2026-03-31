@@ -1,5 +1,7 @@
 package net.paradise_client.inject.accessor;
 
+import java.util.UUID;
+
 /**
  * This interface provides an accessor method for setting the username in a session. It is used in the ParadiseClient
  * Fabric mod to modify the username before it is sent to the server.
@@ -16,4 +18,6 @@ public interface SessionAccessor {
    *                 valid string according to Minecraft's username requirements.
    */
   void paradiseClient$setUsername(String username);
+
+  void paradiseClient$setUUID(UUID uuid);
 }
