@@ -119,7 +119,6 @@ public class UUIDSpoofScreen extends Screen {
   }
 
   private void spoof() {
-    this.bungeeSpoofMod.sessionAccessor.paradiseClient$setUsername(this.bungeeSpoofMod.usernameReal);
     if (this.bungeeSpoofMod.isUUIDOnline) {
       try {
         this.bungeeSpoofMod.uuid = Helper.fetchUUID(this.bungeeSpoofMod.usernameFake);
@@ -131,9 +130,11 @@ public class UUIDSpoofScreen extends Screen {
     } else {
       this.status = "Generating cracked UUID";
       this.bungeeSpoofMod.uuid =
-        UUID.nameUUIDFromBytes(("OfflinePlayer:" + bungeeSpoofMod.usernameFake).getBytes()).toString().replace("-", "");
+        UUID.nameUUIDFromBytes(("OfflinePlayer:" + bungeeSpoofMod.usernameFake).getBytes());
       this.status = "Successfully spoofed cracked UUID for \"" + this.bungeeSpoofMod.usernameFake + "\".";
     }
+    this.bungeeSpoofMod.sessionAccessor.paradiseClient$setUsername(this.bungeeSpoofMod.usernameReal);
+    this.bungeeSpoofMod.sessionAccessor.paradiseClient$setUUID(this.bungeeSpoofMod.uuid);
   }
 
   private int getNewHeight() {

@@ -50,7 +50,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
       this.address += "\000" +
         bungeeSpoofMod.ip +
         "\000" +
-        bungeeSpoofMod.uuid +
+        bungeeSpoofMod.uuid.toString().replace("-", "") +
         "\000" +
         "[{\"name\": \"bungeeguard-token\", \"value\": \"" +
         ParadiseClient.BUNGEE_SPOOF_MOD.token +

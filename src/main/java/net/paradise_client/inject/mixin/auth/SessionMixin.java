@@ -4,6 +4,8 @@ import net.minecraft.client.session.Session;
 import net.paradise_client.inject.accessor.SessionAccessor;
 import org.spongepowered.asm.mixin.*;
 
+import java.util.UUID;
+
 /**
  * Mixin class for modifying the behavior of the Session class.
  * <p>
@@ -18,6 +20,8 @@ import org.spongepowered.asm.mixin.*;
 
   @Final @Shadow @Mutable private String username;
 
+  @Final @Shadow @Mutable private UUID uuid;
+
   /**
    * Sets the username in the Session class.
    * <p>
@@ -29,5 +33,9 @@ import org.spongepowered.asm.mixin.*;
    */
   @Override public void paradiseClient$setUsername(String username) {
     this.username = username;
+  }
+
+  @Override public void paradiseClient$setUUID(UUID uuid) {
+    this.uuid = uuid;
   }
 }

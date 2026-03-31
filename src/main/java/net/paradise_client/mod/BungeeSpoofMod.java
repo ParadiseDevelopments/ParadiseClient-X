@@ -4,6 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.session.Session;
 import net.paradise_client.inject.accessor.SessionAccessor;
 
+import java.util.UUID;
+
 /**
  * Handles BungeeCord spoofing operations.
  * <p>
@@ -38,7 +40,7 @@ public class BungeeSpoofMod {
   /**
    * The UUID used for BungeeCord spoofing.
    */
-  public String uuid;
+  public UUID uuid;
 
   /**
    * The IP address used for BungeeCord spoofing.
@@ -78,7 +80,7 @@ public class BungeeSpoofMod {
     this.usernameReal = minecraftSession.getUsername();
     this.usernameFake = this.usernameReal;
     this.isUUIDOnline = false;
-    this.uuid = minecraftSession.getUuidOrNull().toString().replace("-", "");
+    this.uuid = minecraftSession.getUuidOrNull();
     this.ip = "1.3.3.7";
     this.hostname = "0.0.0.0";
     this.token = "";
