@@ -11,7 +11,7 @@ import net.minecraft.util.Formatting;
 import net.paradise_client.inject.accessor.ClientConnectionAccessor;
 import net.paradise_client.protocol.Protocol;
 import net.paradise_client.protocol.packet.AbstractPacket;
-import net.paradise_client.protocol.packet.impl.PluginMessagePacket;
+import net.paradise_client.protocol.packet.impl.*;
 import net.paradise_client.ui.notification.Notification;
 
 import java.awt.*;
@@ -295,14 +295,18 @@ public class Helper {
     return new PacketByteBuf(buf);
   }
 
-  public static String fetchUUID(String username) throws Exception {
+  public static UUID fetchUUID(String username) throws Exception {
     URL url = new URL("https://api.minecraftservices.com/minecraft/profile/lookup/name/" + username);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.setRequestMethod("GET");
     if (connection.getResponseCode() == 200) {
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
         String response = reader.lines().reduce("", (acc, line) -> acc + line);
-        return JsonParser.parseString(response).getAsJsonObject().get("id").getAsString();
+        return UUID.fromString(JsonParser.parseString(response)
+          .getAsJsonObject()
+          .get("id")
+          .getAsString()
+          .replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
       }
     }
     throw new Exception("Failed to fetch UUID");
