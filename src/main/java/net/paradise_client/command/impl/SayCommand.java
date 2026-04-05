@@ -19,6 +19,6 @@ public class SayCommand extends Command {
       ((ClientPlayNetworkHandlerAccessor) MinecraftClient.getInstance()
         .getNetworkHandler()).paradiseClient$sendChatMessage(message);
       return SINGLE_SUCCESS;
-    }));
+    })).executes(this::incompleteCommand);
   }
 }
