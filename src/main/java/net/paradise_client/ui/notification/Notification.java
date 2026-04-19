@@ -3,6 +3,8 @@ package net.paradise_client.ui.notification;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.MathHelper;
+import net.paradise_client.themes.AbstractThemeRenderer;
+import net.paradise_client.themes.Theme;
 import net.paradise_client.themes.ThemeManager;
 
 public class Notification {
@@ -18,6 +20,7 @@ public class Notification {
   private final String title;
   private final String message;
   private final long startTime;
+  private final AbstractThemeRenderer theme = Theme.TRANSPARENT.getRenderer();
 
   private int x, y, width, height;
 
@@ -72,17 +75,16 @@ public class Notification {
     }
     this.y = (int) baseY;
 
-    // Use ThemeManager to render the notification panel
-    ThemeManager.renderHudPanel(ctx, x, y, width, height);
+    theme.renderHudPanel(ctx, x, y, width, height);
 
-    int txtClr = argb(alphaMul, 0xFFFFFF);
-    int titleClr = argb(alphaMul, 0x00D4FF); // Modern Cyan
+    int txtClr = argb(alphaMul, getMessageColor());
+    int titleClr = argb(alphaMul, getTitleColor());
 
     ctx.drawText(tr, title, x + PADDING_X, y + PADDING_Y, titleClr, false);
     ctx.drawText(tr, message, x + PADDING_X, y + PADDING_Y + tr.fontHeight + 4, txtClr, false);
 
     float barFrac = 1f - pLife;
-    ThemeManager.renderProgressBar(ctx, x, y + height - BAR_HEIGHT, width, BAR_HEIGHT, barFrac);
+    theme.renderProgressBar(ctx, x, y + height - BAR_HEIGHT, width, BAR_HEIGHT, barFrac);
 
     return pLife >= 1f;
   }
@@ -101,5 +103,23 @@ public class Notification {
 
   private static int argb(float alpha, int rgb) {
     return ((int) (alpha * 255) << 24) | (rgb & 0x00FFFFFF);
+  }
+
+  private int getTitleColor() {
+    Theme currentTheme = ThemeManager.getTheme();
+    return switch (currentTheme) {
+      case MATRIX -> 0x00FF00;
+      case PARTICLE -> 0xD4A8FF;
+      case LEGACY -> 0xE0E0E0;
+      case MODERN, TRANSPARENT -> 0x00D4FF;
+    };
+  }
+
+  private int getMessageColor() {
+    Theme currentTheme = ThemeManager.getTheme();
+    return switch (currentTheme) {
+      case MATRIX -> 0x00AA00;
+      case PARTICLE, LEGACY, MODERN, TRANSPARENT -> 0xFFFFFF;
+    };
   }
 }
