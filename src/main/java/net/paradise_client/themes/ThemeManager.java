@@ -8,7 +8,7 @@ import net.paradise_client.ParadiseClient;
  * Main theme rendering manager - delegates to active theme
  */
 public class ThemeManager {
-  private static Theme currentTheme = Theme.PARTICLE;
+  private static Theme currentTheme = Theme.LEGACY;
 
   public static void setTheme(Theme theme) {
     currentTheme = theme;

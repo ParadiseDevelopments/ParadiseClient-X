@@ -16,19 +16,29 @@ import java.util.*;
 public class CommandManager {
 
   public enum CommandCategory {
-    EXPLOIT("Exploits"),
-    UTILITY("Utility"),
-    MISC("Miscellaneous"),
-    CRASH("Crashers");
+    EXPLOIT("Exploits", "⚔"),
+    COMBAT("Combat", "🗡"),
+    MOVEMENT("Movement", "✈"),
+    VISUAL("Visual", "👁"),
+    PLAYER("Player", "👤"),
+    UTILITY("Utility", "🛠"),
+    MISC("Miscellaneous", "📦"),
+    CRASH("Crashers", "💥");
 
     private final String displayName;
+    private final String icon;
 
-    CommandCategory(String displayName) {
+    CommandCategory(String displayName, String icon) {
       this.displayName = displayName;
+      this.icon = icon;
     }
 
     public String getDisplayName() {
       return displayName;
+    }
+
+    public String getIcon() {
+      return icon;
     }
   }
 
@@ -63,9 +73,10 @@ public class CommandManager {
 
   public void register(Command command) {
     this.commands.add(command);
-    LiteralArgumentBuilder<CommandSource> node = Command.literal(command.getName());
-    command.build(node);
-    DISPATCHER.register(node);
+    LiteralArgumentBuilder<CommandSource> builder = Command.literal(command.getName());
+    command.build(builder);
+    com.mojang.brigadier.tree.LiteralCommandNode<CommandSource> node = DISPATCHER.register(builder);
+    command.setNode(node);
     Constants.LOGGER.info("Registered command: {}", command.getName());
   }
 

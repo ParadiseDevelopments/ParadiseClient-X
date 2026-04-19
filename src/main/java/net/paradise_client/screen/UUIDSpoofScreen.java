@@ -7,6 +7,7 @@ import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
 import net.paradise_client.*;
 import net.paradise_client.mod.BungeeSpoofMod;
+import net.paradise_client.themes.ThemeManager;
 
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public class UUIDSpoofScreen extends Screen {
   private final Screen parentScreen;
   private final MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
-  private String status;
+  private String status = "Stand by";
   private TextFieldWidget bungeeUsernameField;
   private TextFieldWidget bungeeFakeUsernameField;
   private TextFieldWidget bungeeTokenField;
@@ -37,9 +38,20 @@ public class UUIDSpoofScreen extends Screen {
   }
 
   @Override public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-    this.renderBackground(context, mouseX, mouseY, delta);
+    ThemeManager.renderBackground(context, width, height);
+    
+    int panelWidth = 240;
+    int panelHeight = 280;
+    int panelX = (width - panelWidth) / 2;
+    int panelY = (height - panelHeight) / 2;
+    
+    ThemeManager.renderPanel(context, panelX, panelY, panelWidth, panelHeight);
+    ThemeManager.renderTitleBar(context, panelX, panelY, panelWidth, 25, "UUID Spoofing Tool", textRenderer, true);
+
     super.render(context, mouseX, mouseY, delta);
-    context.drawCenteredTextWithShadow(this.textRenderer, this.status, this.width / 2, 20, 0xFFFFFF);
+    
+    int statusColor = status.contains("Error") ? 0xFFFF5555 : 0xFF00D4FF;
+    context.drawCenteredTextWithShadow(this.textRenderer, this.status, this.width / 2, panelY + 35, statusColor);
   }
 
   @Override public void close() {
@@ -47,32 +59,30 @@ public class UUIDSpoofScreen extends Screen {
   }
 
   @Override protected void init() {
-    status = "Stand by";
-    int widgetWidth = 200;
-    int widgetXOffset = widgetWidth / 2;
-    currentHeight = this.height / 2 - 90;
+    int widgetWidth = 180;
+    int panelY = (height - 280) / 2;
+    currentHeight = panelY + 50;
 
     this.bungeeUsernameField =
       addInputField("Username", this.bungeeSpoofMod.usernameReal, value -> this.bungeeSpoofMod.usernameReal = value);
-    this.bungeeFakeUsernameField = addInputField("FakeUsername",
+    this.bungeeFakeUsernameField = addInputField("Fake Username",
       this.bungeeSpoofMod.usernameFake,
       value -> this.bungeeSpoofMod.usernameFake = value);
     this.bungeeTokenField =
       addInputField("BungeeGuard Token", this.bungeeSpoofMod.token, value -> this.bungeeSpoofMod.token = value);
 
-    premiumButton = addButton(bungeeSpoofMod.isUUIDOnline ? "Premium" : "Cracked",
+    premiumButton = addButton(bungeeSpoofMod.isUUIDOnline ? "Mode: Premium" : "Mode: Cracked",
       widgetWidth,
-      widgetXOffset,
       button -> togglePremium());
-    addButton("Spoof", widgetWidth, widgetXOffset, button -> spoof());
-    addButton("Exit", widgetWidth, widgetXOffset, button -> close());
+    addButton("Apply Spoof", widgetWidth, button -> spoof());
+    addButton("Back", widgetWidth, button -> close());
   }
 
   @Override public void resize(MinecraftClient client, int width, int height) {
     String username = this.bungeeUsernameField.getText();
     String fakeUsername = this.bungeeFakeUsernameField.getText();
     String token = this.bungeeTokenField.getText();
-    this.init(client, width, height);
+    super.resize(client, width, height);
     this.bungeeUsernameField.setText(username);
     this.bungeeFakeUsernameField.setText(fakeUsername);
     this.bungeeTokenField.setText(token);
@@ -81,36 +91,51 @@ public class UUIDSpoofScreen extends Screen {
   private TextFieldWidget addInputField(String label,
     String initialValue,
     java.util.function.Consumer<String> onTextChanged) {
-    int widgetWidth = 200;
-    int widgetXOffset = widgetWidth / 2;
+    int widgetWidth = 180;
     int tHeight = getNewHeight();
 
     TextFieldWidget textField = new TextFieldWidget(this.textRenderer,
-      this.width / 2 - widgetXOffset,
+      this.width / 2 - widgetWidth / 2,
       tHeight,
       widgetWidth,
       20,
-      Text.literal(label));
+      Text.literal(label)) {
+        @Override
+        public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+            ThemeManager.renderTextField(context, getX(), getY(), getWidth(), getHeight(), isFocused());
+            int color = isFocused() ? 0xFFFFFFFF : 0xFFAAAAAA;
+            context.drawText(MinecraftClient.getInstance().textRenderer, getText(), getX() + 4, getY() + (getHeight() - 8) / 2, color, false);
+        }
+    };
     textField.setMaxLength(256);
     textField.setText(initialValue);
     textField.setChangedListener(onTextChanged);
     this.addSelectableChild(textField);
     this.addDrawable(textField);
 
-    this.addDrawable(new TextWidget(this.width / 2 - widgetXOffset,
-      tHeight - 15,
+    this.addDrawable(new TextWidget(this.width / 2 - widgetWidth / 2,
+      tHeight - 12,
       widgetWidth,
-      20,
+      10,
       Text.literal(label),
       this.textRenderer));
 
     return textField;
   }
 
-  private ButtonWidget addButton(String label, int width, int xOffset, ButtonWidget.PressAction action) {
-    return this.addDrawableChild(ButtonWidget.builder(Text.literal(label), action)
-      .dimensions(this.width / 2 - xOffset, getNewHeight() - 10, width, 20)
-      .build());
+  private ButtonWidget addButton(String label, int width, ButtonWidget.PressAction action) {
+    return this.addDrawableChild(new ThemeButton(this.width / 2 - width / 2, getNewHeight() - 5, width, 20, Text.literal(label), action));
+  }
+
+  private static class ThemeButton extends ButtonWidget {
+    public ThemeButton(int x, int y, int width, int height, Text message, PressAction onPress) {
+      super(x, y, width, height, message, onPress, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
+    }
+
+    @Override
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+      ThemeManager.renderButton(context, getX(), getY(), getWidth(), getHeight(), isHovered(), false, getMessage().getString(), MinecraftClient.getInstance().textRenderer);
+    }
   }
 
   private void togglePremium() {

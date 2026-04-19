@@ -9,6 +9,8 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.command.CommandSource;
 import net.paradise_client.Helper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class Command {
@@ -18,6 +20,7 @@ public abstract class Command {
   private final String description;
   private final boolean async;
   private final CommandManager.CommandCategory category;
+  private com.mojang.brigadier.tree.LiteralCommandNode<net.minecraft.command.CommandSource> node;
 
   public Command(String name, String description, CommandManager.CommandCategory category) {
     this(name, description, category, false);
@@ -30,16 +33,28 @@ public abstract class Command {
     this.async = async;
   }
 
-  protected static LiteralArgumentBuilder<CommandSource> literal(final String name) {
+  public com.mojang.brigadier.tree.LiteralCommandNode<net.minecraft.command.CommandSource> getNode() {
+    return node;
+  }
+
+  public void setNode(com.mojang.brigadier.tree.LiteralCommandNode<net.minecraft.command.CommandSource> node) {
+    this.node = node;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  protected static LiteralArgumentBuilder<net.minecraft.command.CommandSource> literal(final String name) {
     return LiteralArgumentBuilder.literal(name);
   }
 
-  protected static <T> RequiredArgumentBuilder<CommandSource, T> argument(final String name,
-                                                                          final ArgumentType<T> type) {
+  protected static <T> RequiredArgumentBuilder<net.minecraft.command.CommandSource, T> argument(final String name,
+                                                                                              final ArgumentType<T> type) {
     return RequiredArgumentBuilder.argument(name, type);
   }
 
-  public abstract void build(LiteralArgumentBuilder<CommandSource> root);
+  public abstract void build(LiteralArgumentBuilder<net.minecraft.command.CommandSource> root);
 
   public CompletableFuture<Suggestions> suggestOnlinePlayers(CommandContext<?> ctx, SuggestionsBuilder builder) {
     String partialName;
@@ -50,14 +65,14 @@ public abstract class Command {
     }
 
     if (partialName.isEmpty()) {
-      getMinecraftClient().getNetworkHandler()
+      MinecraftClient.getInstance().getNetworkHandler()
               .getPlayerList()
               .forEach(playerListEntry -> builder.suggest(playerListEntry.getProfile().getName()));
       return builder.buildFuture();
     }
 
     String finalPartialName = partialName;
-    getMinecraftClient().getNetworkHandler()
+    MinecraftClient.getInstance().getNetworkHandler()
             .getPlayerList()
             .stream()
             .map(PlayerListEntry::getProfile)
@@ -74,10 +89,6 @@ public abstract class Command {
   public int incompleteCommand(CommandContext<?> context) {
     Helper.printChatMessage("Incomplete command!");
     return 1;
-  }
-
-  public String getName() {
-    return name;
   }
 
   public String getDescription() {
