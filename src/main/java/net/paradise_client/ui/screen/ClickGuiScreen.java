@@ -33,6 +33,7 @@ public class ClickGuiScreen extends Screen {
 
     private String searchText = "";
     private boolean searchFocused = false;
+    private Command hoveredCommand = null;
 
     public ClickGuiScreen() {
         super(Text.literal("Paradise Click GUI"));
@@ -76,6 +77,7 @@ public class ClickGuiScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         theme.renderBackground(context, width, height);
+        hoveredCommand = null;
 
         float scale = 0.95f + (animationProgress * 0.05f);
 
@@ -99,6 +101,18 @@ public class ClickGuiScreen extends Screen {
         }
 
         context.getMatrices().pop();
+
+        if (hoveredCommand != null) {
+            renderTooltip(context, mouseX, mouseY);
+        }
+    }
+
+    private void renderTooltip(DrawContext context, int mouseX, int mouseY) {
+        if (hoveredCommand == null) return;
+        List<Text> lines = new ArrayList<>();
+        lines.add(Text.literal(hoveredCommand.getName()).formatted(net.minecraft.util.Formatting.BLUE, net.minecraft.util.Formatting.BOLD));
+        lines.add(Text.literal(hoveredCommand.getDescription()).formatted(net.minecraft.util.Formatting.GRAY));
+        context.drawTooltip(textRenderer, lines, mouseX, mouseY);
     }
 
     @Override
@@ -244,7 +258,7 @@ public class ClickGuiScreen extends Screen {
                 button.x = x;
                 button.y = currentY;
                 button.width = width;
-                button.render(context, mouseX, (int) (mouseY + scrollY), delta);
+                button.render(context, mouseX, mouseY, delta);
                 currentY += button.getHeight();
             }
 
@@ -298,13 +312,21 @@ public class ClickGuiScreen extends Screen {
             }
 
             if (expanded && isHovered(mouseX, mouseY, x, y + 20, width, maxContentHeight)) {
-                double scrolledMouseY = mouseY + scrollY;
-                for (ModuleButton buttonEntry : buttons) {
-                    if (searchText.isEmpty() || buttonEntry.command.getName().toLowerCase(Locale.ROOT).contains(searchText.toLowerCase(Locale.ROOT))) {
-                        if (buttonEntry.mouseClicked(mouseX, scrolledMouseY, button)) {
-                            return true;
-                        }
+                int titleHeight = 20;
+                int currentY = y + titleHeight - scrollY;
+
+                List<ModuleButton> filteredButtons = buttons.stream()
+                        .filter(b -> searchText.isEmpty() || b.command.getName().toLowerCase(Locale.ROOT).contains(searchText.toLowerCase(Locale.ROOT)))
+                        .toList();
+
+                for (ModuleButton buttonEntry : filteredButtons) {
+                    buttonEntry.x = x;
+                    buttonEntry.y = currentY;
+                    buttonEntry.width = width;
+                    if (buttonEntry.mouseClicked(mouseX, mouseY, button)) {
+                        return true;
                     }
+                    currentY += buttonEntry.getHeight();
                 }
             }
             return false;
@@ -378,6 +400,9 @@ public class ClickGuiScreen extends Screen {
 
         private void render(DrawContext context, int mouseX, int mouseY, float delta) {
             boolean hovered = isHovered(mouseX, mouseY, x, y, width, height);
+            if (hovered) {
+                hoveredCommand = command;
+            }
             hoverProgress = hovered ? Math.min(1f, hoverProgress + 0.15f) : Math.max(0f, hoverProgress - 0.15f);
             expansionProgress = expanded ? Math.min(1f, expansionProgress + 0.15f) : Math.max(0f, expansionProgress - 0.15f);
 
