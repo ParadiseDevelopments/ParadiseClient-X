@@ -14,11 +14,11 @@ import net.paradise_client.addon.AddonLoader;
 import net.paradise_client.command.CommandManager;
 import net.paradise_client.config.Config;
 import net.paradise_client.discord.DiscordRPCManager;
-import net.paradise_client.event.bus.EventBus;
 import net.paradise_client.exploit.ExploitManager;
 import net.paradise_client.mod.*;
 import net.paradise_client.packet.DummyPacket;
 import net.paradise_client.ui.notification.NotificationManager;
+import net.paradise_client.ui.screen.ClickGuiScreen;
 import org.lwjgl.glfw.*;
 import org.lwjgl.system.MemoryStack;
 
@@ -126,9 +126,17 @@ public class ParadiseClient implements ModInitializer, ClientModInitializer {
       GLFW.GLFW_KEY_COMMA,
       Constants.MOD_NAME));
 
+    KeyBinding clickGuiKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("Open Paradise Click GUI",
+      InputUtil.Type.KEYSYM,
+      GLFW.GLFW_KEY_RIGHT_SHIFT,
+      Constants.MOD_NAME));
+
     ClientTickEvents.END_CLIENT_TICK.register(client -> {
       while (keyBinding.wasPressed()) {
         client.setScreen(new ChatScreen(COMMAND_MANAGER.prefix));
+      }
+      while (clickGuiKey.wasPressed()) {
+        client.setScreen(new ClickGuiScreen());
       }
     });
   }

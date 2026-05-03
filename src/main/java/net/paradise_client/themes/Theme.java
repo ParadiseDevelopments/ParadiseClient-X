@@ -10,7 +10,8 @@ public enum Theme {
   PARTICLE("Particle", new ParticleThemeRenderer()),
   LEGACY("Legacy", new LegacyThemeRenderer()),
   MODERN("Modern", new ModernThemeRenderer()),
-  GLASSMORPHISM("Glassmorphism", new GlassmorphismThemeRenderer());
+//  GLASSMORPHISM("Glassmorphism", new GlassmorphismThemeRenderer()),
+TRANSPARENT("Transparent", new TransparentThemeRenderer());
 
   private final String name;
   private final AbstractThemeRenderer renderer;

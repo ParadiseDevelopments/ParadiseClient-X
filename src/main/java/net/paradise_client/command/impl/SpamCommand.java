@@ -43,7 +43,7 @@ public class SpamCommand extends Command {
       isRunning = false;
       return SINGLE_SUCCESS;
     })).then(argument("repeation", IntegerArgumentType.integer()).executes((context) -> {
-      Helper.printChatMessage("§4§l" + context.getInput() + "<repeation> <delay> <command>");
+      Helper.printChatMessage("§4§l" + context.getInput() + " <delay> <command>");
       return SINGLE_SUCCESS;
     }).then(argument("delay", IntegerArgumentType.integer()).executes((context) -> {
       Helper.printChatMessage("§4§l" + context.getInput() + " <command>");
@@ -69,9 +69,6 @@ public class SpamCommand extends Command {
       });
       thread.start();
       return SINGLE_SUCCESS;
-    })).executes((context) -> {
-      Helper.printChatMessage("§4§l" + context.getInput() + "<repeation> <delay> <command>");
-      return SINGLE_SUCCESS;
-    })));
+    })))).executes(this::incompleteCommand);
   }
 }
