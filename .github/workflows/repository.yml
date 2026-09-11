@@ -42,19 +42,17 @@ jobs:
               BASE_JAR_FILES+=("$file")
             fi
           done
+
           if [ ${#BASE_JAR_FILES[@]} -ne 1 ]; then
             echo "Error: Expected exactly one base version JAR file, found ${#BASE_JAR_FILES[@]}"
             exit 1
           fi
+
           JAR_FILE="${BASE_JAR_FILES[0]}"
-          
-          # Strip "-shaded" from the filename if present
-          CLEAN_JAR_NAME=$(basename "$JAR_FILE" | sed 's/-shaded//')
-          CLEAN_JAR_PATH="build/libs/$CLEAN_JAR_NAME"
-          cp "$JAR_FILE" "$CLEAN_JAR_PATH"
-          
-          echo "JAR_FILE=$CLEAN_JAR_PATH" >> $GITHUB_ENV
-          echo "JAR_NAME=$CLEAN_JAR_NAME" >> $GITHUB_ENV
+          JAR_NAME=$(basename "$JAR_FILE")
+          echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
+          echo "JAR_NAME=$JAR_NAME" >> $GITHUB_ENV
+
       - name: Upload artifact to Nexus
         run: |
           curl -X PUT "https://paradise-client.net/api/versions" \
