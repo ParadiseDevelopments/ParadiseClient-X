@@ -34,8 +34,8 @@ This project is open source under the following terms:
 
 Before installing, ensure you meet these prerequisites:
 
-- **Java**: Version 21
-- **Fabric & Minecraft**: Version 1.21.5
+- **Java**: Version 25
+- **Fabric & Minecraft**: Version 26.2
 
 ## **Support and Development Builds**
 
