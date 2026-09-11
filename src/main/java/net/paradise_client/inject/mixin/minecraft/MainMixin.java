@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
    * @param args Command-line arguments passed to the main method.
    * @param ci   Callback information.
    */
-  @Inject(method = "main", at = @At(value = "HEAD"), remap = false) private static void mainHead(String[] args, CallbackInfo ci) {
+  @Inject(method = "main", at = @At(value = "HEAD")) private static void mainHead(String[] args, CallbackInfo ci) {
     System.setProperty("java.awt.headless", "false");
   }
 }

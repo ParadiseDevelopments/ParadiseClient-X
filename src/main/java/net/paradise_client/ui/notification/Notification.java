@@ -1,6 +1,7 @@
 package net.paradise_client.ui.notification;
 
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.Mth;
 
 public class Notification {
@@ -97,6 +98,13 @@ public class Notification {
     ctx.fill(x, barY0, x + barW, barY1, barFg);
 
     return pLife >= 1f;
+  }
+
+  public static void drawBorder(GuiGraphicsExtractor ctx, int x, int y, int width, int height, int color) {
+    ctx.fill(x, y, x + width, y + 1, color);
+    ctx.fill(x, y + height - 1, x + width, y + height, color);
+    ctx.fill(x, y, x + 1, y + height, color);
+    ctx.fill(x + width - 1, y, x + width, y + height, color);
   }
 
   private static float easeOutCubic(float t) {

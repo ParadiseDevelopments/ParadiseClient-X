@@ -54,7 +54,7 @@ public enum ProtocolVersion {
   V_1_21_7(772, "1.21.7", "1.21.8"),
   V_1_21_9(773, "1.21.9", "1.21.10"),
   V_1_21_11(774, "1.21.11"),
-  V_26_1(775, "26.1", "26.1.1", "26.1.2"),
+  V_26_1(775, "26.1"),
   V_26_2(776, "26.2");
   public static final List<Integer> SUPPORTED_VERSION_IDS = new ArrayList<>();
 

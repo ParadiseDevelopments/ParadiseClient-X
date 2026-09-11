@@ -4,7 +4,7 @@ import net.fabricmc.fabric.impl.networking.PayloadTypeRegistryImpl;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.*;
+import net.minecraft.resources.Identifier;
 import net.paradise_client.inject.accessor.PayloadTypeRegistryImplAccessor;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;

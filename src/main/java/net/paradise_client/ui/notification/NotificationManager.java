@@ -1,8 +1,8 @@
 package net.paradise_client.ui.notification;
 
 import java.util.*;
-
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class NotificationManager {
   private final List<Notification> notifications = new ArrayList<>();

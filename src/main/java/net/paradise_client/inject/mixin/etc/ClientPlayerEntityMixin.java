@@ -16,4 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
   }
 
   @Shadow public abstract void sendSystemMessage(Component message);
+
+  @Unique private void sendMessage(Component message) {
+    this.sendSystemMessage(message);
+  }
 }

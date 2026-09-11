@@ -28,12 +28,11 @@ import org.spongepowered.asm.mixin.injection.callback.*;
    *
    * @param callback Callback information for the return value.
    */
-  @Inject(method = "createTitle",
-    at = @At(value = "INVOKE",
-      target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-      ordinal = 1),
-    cancellable = true) private void getClientTitle(CallbackInfoReturnable<String> callback) {
-    callback.setReturnValue(Constants.windowTitle);
+  @Inject(method = "updateTitle",
+    at = @At(value = "HEAD"),
+    cancellable = true) private void getClientTitle(CallbackInfo ci) {
+    Minecraft.getInstance().getWindow().setTitle(Constants.windowTitle);
+    ci.cancel();
   }
 
   /**

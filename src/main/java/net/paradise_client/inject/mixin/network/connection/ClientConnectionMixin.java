@@ -1,6 +1,7 @@
 package net.paradise_client.inject.mixin.network.connection;
 
-import io.netty.channel.*;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.*;
 import net.minecraft.network.chat.Component;
@@ -12,7 +13,6 @@ import net.paradise_client.event.bus.EventBus;
 import net.paradise_client.event.impl.network.PhaseChangeEvent;
 import net.paradise_client.event.impl.network.packet.incoming.*;
 import net.paradise_client.event.impl.network.packet.outgoing.*;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -101,17 +101,18 @@ import java.util.List;
   }
 
   /**
-   * Injects code at the start of the send method to handle outgoing packets.
+   * Injects code at the start of the sendImmediately method to handle outgoing packets.
    * <p>
    * This method cancels the sending of the packet if the PacketOutgoingPreEvent event returns false.
    * </p>
    *
    * @param packet    The outgoing packet.
-   * @param listener The packet listener.
+   * @param callbacks The packet callbacks.
+   * @param flush     Whether to flush the packet.
    * @param ci        Callback information.
    */
-  @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;)V", at = @At("HEAD"), cancellable = true)
-  public void sendImmediatelyHead(Packet<?> packet, @Nullable ChannelFutureListener listener, CallbackInfo ci) {
+  @Inject(method = "sendPacket", at = @At("HEAD"), cancellable = true)
+  public void sendImmediatelyHead(Packet<?> packet, ChannelFutureListener callbacks, boolean flush, CallbackInfo ci) {
     EventBus.ListenerContext<PacketOutgoingPreEvent> ctx =
       EventBus.fire(EventBus.PACKET_OUTGOING_PRE_EVENT_CHANNEL, new PacketOutgoingPreEvent(packet));
     if (ctx.isCancelled()) {
@@ -120,17 +121,20 @@ import java.util.List;
   }
 
   /**
-   * Injects code at the end of the send method to handle post-processing of outgoing packets.
+   * Injects code at the end of the sendImmediately method to handle post-processing of outgoing packets.
    * <p>
    * This method triggers the PacketOutgoingPostEvent event after the packet has been sent.
    * </p>
    *
    * @param packet    The outgoing packet.
-   * @param listener The packet listener.
+   * @param callbacks The packet callbacks.
+   * @param flush     Whether to flush the packet.
    * @param ci        Callback information.
    */
-  @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;)V", at = @At("TAIL"))
-  public void sendImmediatelyTail(Packet<?> packet, @Nullable ChannelFutureListener listener, CallbackInfo ci) throws InvocationTargetException, IllegalAccessException {
+  @Inject(method = "sendPacket", at = @At("TAIL")) public void sendImmediatelyTail(Packet<?> packet,
+    ChannelFutureListener callbacks,
+    boolean flush,
+    CallbackInfo ci) throws InvocationTargetException, IllegalAccessException {
     EventBus.fire(EventBus.PACKET_OUTGOING_POST_EVENT_CHANNEL, new PacketOutgoingPostEvent(packet));
   }
 

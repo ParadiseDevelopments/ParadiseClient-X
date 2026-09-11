@@ -1,7 +1,10 @@
 package net.paradise_client.inject.mixin.network.connection;
 
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.LastSeenMessagesTracker;
+import net.minecraft.network.chat.MessageSignature;
+import net.minecraft.network.chat.SignedMessageBody;
+import net.minecraft.network.chat.SignedMessageChain;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.resources.ResourceKey;
@@ -96,7 +99,7 @@ public abstract class ClientPlayNetworkHandlerMixin implements ClientPlayNetwork
 
     if (content.startsWith(ParadiseClient.COMMAND_MANAGER.prefix)) {
       ParadiseClient.COMMAND_MANAGER.dispatch(content.substring(1));
-      ParadiseClient.MINECRAFT_CLIENT.gui.chatListener().handleOverlay(Component.literal(content));
+      ParadiseClient.MINECRAFT_CLIENT.gui.hud.getChat().addRecentChat(content);
       ci.cancel();
     }
   }

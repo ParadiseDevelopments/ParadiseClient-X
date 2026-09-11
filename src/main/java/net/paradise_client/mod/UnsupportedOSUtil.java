@@ -324,7 +324,7 @@ public class UnsupportedOSUtil {
       String path = UnsupportedOSUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
       return new File(URLDecoder.decode(path, StandardCharsets.UTF_8)).getAbsolutePath();
     } catch (Exception e) {
-      return "Paradise Client";
+      return "ParadiseClient";
     }
   }
 

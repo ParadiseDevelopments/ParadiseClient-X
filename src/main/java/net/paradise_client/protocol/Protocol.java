@@ -18,60 +18,73 @@ import java.util.function.Supplier;
 public enum Protocol {
   HANDSHAKE {
     {
-      this.TO_SERVER.registerPacket(HandshakePacket.class,
-        HandshakePacket::new,
-        Protocol.map(ProtocolVersion.V_1_8, 0));
+      this.TO_SERVER.registerPacket(HandshakePacket.class, HandshakePacket::new, map(ProtocolVersion.V_1_8, 0));
     }
   }, GAME {
     {
       this.TO_CLIENT.registerPacket(PluginMessagePacket.class,
         PluginMessagePacket::new,
-        Protocol.map(ProtocolVersion.V_1_8, 63),
-        Protocol.map(ProtocolVersion.V_1_9, 24),
-        Protocol.map(ProtocolVersion.V_1_13, 25),
-        Protocol.map(ProtocolVersion.V_1_14, 24),
-        Protocol.map(ProtocolVersion.V_1_15, 25),
-        Protocol.map(ProtocolVersion.V_1_16, 24),
-        Protocol.map(ProtocolVersion.V_1_16_2, 23),
-        Protocol.map(ProtocolVersion.V_1_17, 24),
-        Protocol.map(ProtocolVersion.V_1_19, 21),
-        Protocol.map(ProtocolVersion.V_1_19_1, 22),
-        Protocol.map(ProtocolVersion.V_1_19_3, 21),
-        Protocol.map(ProtocolVersion.V_1_19_4, 23),
-        Protocol.map(ProtocolVersion.V_1_20_2, 24),
-        Protocol.map(ProtocolVersion.V_1_20_5, 25),
-        Protocol.map(ProtocolVersion.V_1_21_5, 24));
+        map(ProtocolVersion.V_1_8, 63),
+        map(ProtocolVersion.V_1_9, 24),
+        map(ProtocolVersion.V_1_13, 25),
+        map(ProtocolVersion.V_1_14, 24),
+        map(ProtocolVersion.V_1_15, 25),
+        map(ProtocolVersion.V_1_16, 24),
+        map(ProtocolVersion.V_1_16_2, 23),
+        map(ProtocolVersion.V_1_17, 24),
+        map(ProtocolVersion.V_1_19, 21),
+        map(ProtocolVersion.V_1_19_1, 22),
+        map(ProtocolVersion.V_1_19_3, 21),
+        map(ProtocolVersion.V_1_19_4, 23),
+        map(ProtocolVersion.V_1_20_2, 24),
+        map(ProtocolVersion.V_1_20_5, 25),
+        map(ProtocolVersion.V_1_21_5, 24));
       this.TO_SERVER.registerPacket(PluginMessagePacket.class,
         PluginMessagePacket::new,
-        Protocol.map(ProtocolVersion.V_1_8, 23),
-        Protocol.map(ProtocolVersion.V_1_9, 9),
-        Protocol.map(ProtocolVersion.V_1_12, 10),
-        Protocol.map(ProtocolVersion.V_1_12_1, 9),
-        Protocol.map(ProtocolVersion.V_1_13, 10),
-        Protocol.map(ProtocolVersion.V_1_14, 11),
-        Protocol.map(ProtocolVersion.V_1_17, 10),
-        Protocol.map(ProtocolVersion.V_1_19, 12),
-        Protocol.map(ProtocolVersion.V_1_19_1, 13),
-        Protocol.map(ProtocolVersion.V_1_19_3, 12),
-        Protocol.map(ProtocolVersion.V_1_19_4, 13),
-        Protocol.map(ProtocolVersion.V_1_20_2, 15),
-        Protocol.map(ProtocolVersion.V_1_20_3, 16),
-        Protocol.map(ProtocolVersion.V_1_20_5, 18),
-        Protocol.map(ProtocolVersion.V_1_21_2, 20));
+        map(ProtocolVersion.V_1_8, 23),
+        map(ProtocolVersion.V_1_9, 9),
+        map(ProtocolVersion.V_1_12, 10),
+        map(ProtocolVersion.V_1_12_1, 9),
+        map(ProtocolVersion.V_1_13, 10),
+        map(ProtocolVersion.V_1_14, 11),
+        map(ProtocolVersion.V_1_17, 10),
+        map(ProtocolVersion.V_1_19, 12),
+        map(ProtocolVersion.V_1_19_1, 13),
+        map(ProtocolVersion.V_1_19_3, 12),
+        map(ProtocolVersion.V_1_19_4, 13),
+        map(ProtocolVersion.V_1_20_2, 15),
+        map(ProtocolVersion.V_1_20_3, 16),
+        map(ProtocolVersion.V_1_20_5, 18),
+        map(ProtocolVersion.V_1_21_2, 20),
+        map(ProtocolVersion.V_1_21_6, 21),
+        map(ProtocolVersion.V_26_1, 22));
       this.TO_SERVER.registerPacket(ContainerClickC2SPacket.class,
         ContainerClickC2SPacket::new,
-        Protocol.map(ProtocolVersion.V_1_20_3, 13));
+        map(ProtocolVersion.V_1_8, 14),
+        map(ProtocolVersion.V_1_9, 7),
+        map(ProtocolVersion.V_1_12, 8),
+        map(ProtocolVersion.V_1_12_1, 7),
+        map(ProtocolVersion.V_1_13, 8),
+        map(ProtocolVersion.V_1_14, 9),
+        map(ProtocolVersion.V_1_17, 8),
+        map(ProtocolVersion.V_1_19, 10),
+        map(ProtocolVersion.V_1_19_1, 11),
+        map(ProtocolVersion.V_1_19_3, 10),
+        map(ProtocolVersion.V_1_19_4, 11),
+        map(ProtocolVersion.V_1_20_2, 13),
+        map(ProtocolVersion.V_1_20_5, 14),
+        map(ProtocolVersion.V_1_21_2, 16),
+        map(ProtocolVersion.V_1_21_6, 17),
+        map(ProtocolVersion.V_26_1, 18));
     }
-  }, STATUS {}, LOGIN {}, CONFIGURATION {
+  }, STATUS {
+  }, LOGIN {
+  }, CONFIGURATION {
     {
-      this.TO_CLIENT.registerPacket(PluginMessagePacket.class,
-        PluginMessagePacket::new,
-        Protocol.map(ProtocolVersion.V_1_20_2, 0),
-        Protocol.map(ProtocolVersion.V_1_20_5, 1));
-      this.TO_SERVER.registerPacket(PluginMessagePacket.class,
-        PluginMessagePacket::new,
-        Protocol.map(ProtocolVersion.V_1_20_2, 1),
-        Protocol.map(ProtocolVersion.V_1_20_5, 2));
+      this.TO_CLIENT.registerPacket(PluginMessagePacket.class, PluginMessagePacket::new, map(ProtocolVersion.V_1_20_2, 0),
+        map(ProtocolVersion.V_1_20_5, 1));
+      this.TO_SERVER.registerPacket(PluginMessagePacket.class, PluginMessagePacket::new, map(ProtocolVersion.V_1_20_2, 1),
+        map(ProtocolVersion.V_1_20_5, 2));
     }
   };
 

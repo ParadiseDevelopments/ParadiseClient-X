@@ -29,10 +29,10 @@ import java.util.UUID;
    * interface.
    * </p>
    *
-   * @param name The new username to set.
+   * @param username The new username to set.
    */
-  @Override public void paradiseClient$setUsername(String name) {
-    this.name = name;
+  @Override public void paradiseClient$setUsername(String username) {
+    this.name = username;
   }
 
   @Override public void paradiseClient$setUUID(UUID uuid) {

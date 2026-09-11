@@ -21,19 +21,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
    * Injects custom background rendering into the renderBackground method. This method draws a custom texture for
    * specific screens and cancels the original rendering.
    *
-   * @param graphics The draw context used for rendering.
+   * @param context The draw context used for rendering.
    * @param mouseX  The X coordinate of the mouse.
    * @param mouseY  The Y coordinate of the mouse.
-   * @param a   The time delta since the last frame.
+   * @param delta   The time delta since the last frame.
    * @param ci      The callback information for the method.
    */
-  @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
-  private void renderCustomBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
+  @Inject(method = "extractBackground", at = @At(value = "HEAD"), cancellable = true) private void renderBackground(
+    GuiGraphicsExtractor context,
+    int mouseX,
+    int mouseY,
+    float delta,
+    CallbackInfo ci) {
     if (this.minecraft.level == null) {
-      this.extractPanorama(graphics, a);
-      ci.cancel();
+      this.extractPanorama(context, delta);
     }
+    ci.cancel();
   }
 
-  @Shadow protected abstract void extractPanorama(GuiGraphicsExtractor graphics, float a);
+  @Shadow protected abstract void extractPanorama(GuiGraphicsExtractor context, float deltaTicks);
 }

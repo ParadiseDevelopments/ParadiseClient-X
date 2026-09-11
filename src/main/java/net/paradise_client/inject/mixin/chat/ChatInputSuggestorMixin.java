@@ -42,7 +42,7 @@ import java.util.concurrent.CompletableFuture;
           Minecraft.getInstance().getConnection().getSuggestionsProvider());
       }
 
-      int cursor = this.input.getCursorPosition();
+      int cursor = input.getCursorPosition();
       if (cursor >= length && (this.suggestions == null || !this.keepSuggestions)) {
         this.pendingSuggestions =
           ParadiseClient.COMMAND_MANAGER.DISPATCHER.getCompletionSuggestions(this.currentParse, cursor);
@@ -57,5 +57,5 @@ import java.util.concurrent.CompletableFuture;
     }
   }
 
-  @Shadow public abstract void showSuggestions(boolean bl);
+  @Shadow public abstract void showSuggestions(boolean show);
 }

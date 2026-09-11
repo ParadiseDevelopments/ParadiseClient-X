@@ -41,10 +41,10 @@ public class PlayersCommand extends Command {
       });
 
       if (playerDataMap.isEmpty()) {
-        Helper.printChatMessage(Helper.parseColoredText("No players"));
+        getMinecraftClient().player.sendSystemMessage(Helper.parseColoredText("No players"));
       }
 
-      playerDataMap.forEach((name, playerData) -> Helper.printChatMessage(playerData.getMessage()));
+      playerDataMap.forEach((name, playerData) -> getMinecraftClient().player.sendSystemMessage(playerData.getMessage()));
       return SINGLE_SUCCESS;
     });
   }

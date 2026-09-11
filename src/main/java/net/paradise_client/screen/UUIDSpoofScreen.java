@@ -2,7 +2,9 @@ package net.paradise_client.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.paradise_client.*;
@@ -12,6 +14,12 @@ import java.util.UUID;
 
 import static net.paradise_client.Constants.*;
 
+/**
+ * Screen for spoofing UUIDs.
+ * <p>
+ * This screen allows users to spoof their UUID by setting a Bungee username, a fake username, and choosing between
+ * premium or cracked UUIDs.
+ */
 public class UUIDSpoofScreen extends Screen {
 
   private final BungeeSpoofMod bungeeSpoofMod = ParadiseClient.BUNGEE_SPOOF_MOD;
@@ -31,6 +39,7 @@ public class UUIDSpoofScreen extends Screen {
   }
 
   @Override public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+    this.extractBackground(context, mouseX, mouseY, delta);
     super.extractRenderState(context, mouseX, mouseY, delta);
     context.centeredText(this.font, this.status, this.width / 2, 20, 0xFFFFFF);
   }
@@ -71,13 +80,19 @@ public class UUIDSpoofScreen extends Screen {
     this.bungeeTokenField.setValue(token);
   }
 
-  private EditBox addInputField(String label, String initialValue, java.util.function.Consumer<String> onTextChanged) {
+  private EditBox addInputField(String label,
+    String initialValue,
+    java.util.function.Consumer<String> onTextChanged) {
     int widgetWidth = 200;
     int widgetXOffset = widgetWidth / 2;
     int tHeight = getNewHeight();
 
-    EditBox textField =
-      new EditBox(this.font, this.width / 2 - widgetXOffset, tHeight, widgetWidth, 20, Component.literal(label));
+    EditBox textField = new EditBox(this.font,
+      this.width / 2 - widgetXOffset,
+      tHeight,
+      widgetWidth,
+      20,
+      Component.literal(label));
     textField.setMaxLength(256);
     textField.setValue(initialValue);
     textField.setResponder(onTextChanged);
@@ -116,7 +131,8 @@ public class UUIDSpoofScreen extends Screen {
       }
     } else {
       this.status = "Generating cracked UUID";
-      this.bungeeSpoofMod.uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + bungeeSpoofMod.usernameFake).getBytes());
+      this.bungeeSpoofMod.uuid =
+        UUID.nameUUIDFromBytes(("OfflinePlayer:" + bungeeSpoofMod.usernameFake).getBytes());
       this.status = "Successfully spoofed cracked UUID for \"" + this.bungeeSpoofMod.usernameFake + "\".";
     }
     this.bungeeSpoofMod.sessionAccessor.paradiseClient$setUsername(this.bungeeSpoofMod.usernameReal);

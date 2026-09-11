@@ -6,8 +6,6 @@ import com.viaversion.nbt.io.NBTIO;
 import com.viaversion.nbt.tag.CompoundTag;
 import io.netty.buffer.*;
 import net.paradise_client.protocol.*;
-import net.paradise_client.protocol.ItemStack;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;

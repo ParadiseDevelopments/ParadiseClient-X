@@ -59,32 +59,24 @@ public class GameState {
    * @return The State enum representing the current game state
    */
   public static State getGameStateEnum(Minecraft client) {
-    // i dont know why intelij says gui is not null
-    if (client.gui == null) {
-      return State.UNKNOWN;
-    }
     if (client.gui.screen() != null) {
-      switch (client.gui.screen()) {
-        case TitleScreen _ -> {
-          return State.MAIN_MENU;
-        }
-        case JoinMultiplayerScreen _ -> {
-          return State.MULTIPLAYER;
-        }
-        case SelectWorldScreen _ -> {
-          return State.SINGLEPLAYER;
-        }
-        case PauseScreen _ -> {
-          return client.getCurrentServer() != null ? State.PAUSED_MULTIPLAYER : State.PAUSED_SINGLEPLAYER;
-        }
-        case DisconnectedScreen _ -> {
-          return State.DISCONNECTED;
-        }
-        case ConnectScreen _ -> {
-          return State.CONNECTING;
-        }
-        default -> {
-        }
+      if (client.gui.screen() instanceof TitleScreen) {
+        return State.MAIN_MENU;
+      }
+      if (client.gui.screen() instanceof JoinMultiplayerScreen) {
+        return State.MULTIPLAYER;
+      }
+      if (client.gui.screen() instanceof SelectWorldScreen) {
+        return State.SINGLEPLAYER;
+      }
+      if (client.gui.screen() instanceof PauseScreen) {
+        return client.getCurrentServer() != null ? State.PAUSED_MULTIPLAYER : State.PAUSED_SINGLEPLAYER;
+      }
+      if (client.gui.screen() instanceof DisconnectedScreen) {
+        return State.DISCONNECTED;
+      }
+      if (client.gui.screen() instanceof ConnectScreen) {
+        return State.CONNECTING;
       }
 
       // If we have a screen but it's not one of the above, check if we're in-game

@@ -1,19 +1,27 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.17.12'
+    id 'net.fabricmc.fabric-loom' version '1.17.20'
     id 'maven-publish'
-    id 'com.gradleup.shadow' version '9.0.0'
-    id 'com.gorylenko.gradle-git-properties' version '4.0.1'
+    id 'com.gradleup.shadow' version '9.6.1'
+    id 'com.gorylenko.gradle-git-properties' version '2.5.1'
 }
 
-def gitHash = providers.exec {
-    commandLine 'git', 'rev-parse', '--short', 'HEAD'
-}.standardOutput.asText.get().trim()
+def gitHash = {
+    try {
+        def process = new ProcessBuilder('git', 'rev-parse', '--short', 'HEAD')
+            .redirectErrorStream(true)
+            .start()
+        return process.inputStream.getText().trim()
+    } catch (Exception e) {
+        e.printStackTrace()
+        return "unknown"
+    }
+}.call()
 
 version = gitHash
-group = project.findProperty('maven_group') ?: 'net.paradise_client'
+group = project.maven_group
 
 base {
-    archivesName = project.findProperty('archives_base_name') ?: 'ParadiseClient'
+    archivesName = project.archives_base_name
 }
 
 repositories {
@@ -82,27 +90,20 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
+    sourceCompatibility = JavaVersion.toVersion(targetJavaVersion)
+    targetCompatibility = JavaVersion.toVersion(targetJavaVersion)
     withSourcesJar()
 }
 
-tasks.named('sourcesJar') {
-    dependsOn tasks.named('generateGitProperties')
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archives_base_name}" }
+    }
+    archiveClassifier.set("dev")
 }
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    archiveClassifier.set("shaded")
+    archiveClassifier.set("")
     relocate "com.viaversion.nbt", "net.paradise_client.nbt"
-}
-
-jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveClassifier.set("dev")
-    from("LICENSE") {
-        rename { "${it}_${base.archivesName.get()}" }
-    }
-    dependsOn(shadowJar)
-    from(project.zipTree(tasks.shadowJar.archiveFile.get())) {
-        exclude "META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA"
-    }
 }
